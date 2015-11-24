@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Objet{
 
-	protected string nomObjet;
+	public string nomObjet;
 	public int poidObjet;
 	
 	public Objet(string nom, int poid)

@@ -46,11 +46,14 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\GameEngine\Agent\Script\Architecte\Architecte.cs" />
      <Compile Include="Assets\GameEngine\Agent\Script\BoucheAgent.cs" />
      <Compile Include="Assets\GameEngine\Agent\Script\Bucheron\Bucheron.cs" />
      <Compile Include="Assets\GameEngine\Agent\Script\Marchand\Marchand.cs" />
      <Compile Include="Assets\GameEngine\Agent\Script\Personnage.cs" />
-     <Compile Include="Assets\GameEngine\Agent\Script\PersonnageExterieur.cs" />
+     <Compile Include="Assets\GameEngine\Batiment\Batiment.cs" />
+     <Compile Include="Assets\GameEngine\Batiment\Hotel\HotelBois.cs" />
+     <Compile Include="Assets\GameEngine\Batiment\ListeBatiment.cs" />
      <Compile Include="Assets\GameEngine\Inventaire\Inventaire.cs" />
      <Compile Include="Assets\GameEngine\Inventaire\Objet.cs" />
      <Compile Include="Assets\GameEngine\Lieu\Foret\Arbre.cs" />

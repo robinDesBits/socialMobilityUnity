@@ -1,9 +1,18 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\GameEngine\Agent\Script\Personnage.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\GameEngine\Agent\Script\Architecte\Architecte.cs">
     <Files>
-      <File FileName="Assets\GameEngine\Agent\Script\PersonnageExterieur.cs" Line="6" Column="1" />
+      <File FileName="Assets\GameEngine\Agent\Script\Architecte\Architecte.cs" Line="47" Column="1" />
+      <File FileName="Assets\GameEngine\Batiment\Batiment.cs" Line="1" Column="1" />
+      <File FileName="Assets\GameEngine\Agent\Script\BoucheAgent.cs" Line="1" Column="1" />
+      <File FileName="Assets\GameEngine\Inventaire\Inventaire.cs" Line="1" Column="1" />
+      <File FileName="Assets\GameEngine\Agent\Script\Bucheron\Bucheron.cs" Line="1" Column="1" />
+      <File FileName="Assets\GameEngine\Inventaire\Objet.cs" Line="1" Column="1" />
       <File FileName="Assets\GameEngine\Agent\Script\Personnage.cs" Line="1" Column="1" />
+      <File FileName="Assets\GameEngine\Batiment\Hotel\HotelBois.cs" Line="1" Column="1" />
+      <File FileName="Assets\GameEngine\Batiment\ListeBatiment.cs" Line="1" Column="1" />
+      <File FileName="Assets\GameEngine\Lieu\Ville\Ville.cs" Line="50" Column="49" />
+      <File FileName="Assets\GameEngine\Agent\Script\Marchand\Marchand.cs" Line="32" Column="6" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

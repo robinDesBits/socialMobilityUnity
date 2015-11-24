@@ -18,55 +18,46 @@ public class Bucheron : Personnage {
 	}
 	protected override void ChoisirAction()
 	{
-		if(intention==Intention.RAMENERBOIS)
-		{
-			switch(intentionEtape)
-			{
-				case IntentionEtape.CHERCHERARBRE:
-					if(champVision.Exists(x=>ArbreLibre(x)))
-					{
-						plusArbre=false;
-						cible=champVision.Find(x=>ArbreLibre(x));
-						action=Action.SEDIRIGERVERS;
-						if(Vector3.Distance(cible.transform.position,this.transform.position)<=0.2f)
-						{
-							intentionEtape=IntentionEtape.COUPERARBRE;
-							action=Action.COUPERARBRE;
-						}
+		if (intention == Intention.RAMENERBOIS) {
+			switch (intentionEtape) {
+			case IntentionEtape.CHERCHERARBRE:
+				if (champVision.Exists (x => ArbreLibre (x))) {
+					plusArbre = false;
+					cible = champVision.Find (x => ArbreLibre (x));
+					action = Action.SEDIRIGERVERS;
+					if (Vector3.Distance (cible.transform.position, this.transform.position) <= 0.2f) {
+						intentionEtape = IntentionEtape.COUPERARBRE;
+						action = Action.COUPERARBRE;
 					}
-					else
-					{
-						if(forets.Count>0)
-						{
-							if(champVision.Exists(x=>ArbreLibre(x)))
-							{
-								cible=champVision.Find(x=>ArbreLibre(x));
-							}
-							else
-							{
-								//à remplacer par la plus proche foret
-								cible=forets[0].transform;
-							}
-							action=Action.SEDIRIGERVERS;
+				} else {
+					if (forets.Count > 0) {
+						if (champVision.Exists (x => ArbreLibre (x))) {
+							cible = champVision.Find (x => ArbreLibre (x));
+						} else {
+							//à remplacer par la plus proche foret
+							cible = forets [0].transform;
 						}
-						else
-						{
-							action=Action.CHERCHER;
-						}
+						action = Action.SEDIRIGERVERS;
+					} else {
+						action = Action.CHERCHER;
 					}
-				break;
-				case IntentionEtape.COUPERARBRE:
-				if(inventairePlein)
-				{
-					intention=Intention.SEPROMENER;
-					action=Action.SEPROMENER;
-				}
-				else if(plusArbre==true)
-				{
-					intentionEtape=IntentionEtape.CHERCHERARBRE;
-					action=Action.CHERCHER;
 				}
 				break;
+			case IntentionEtape.COUPERARBRE:
+				if (inventairePlein) {
+					intention = Intention.SEPROMENER;
+					action = Action.SEPROMENER;
+				} else if (plusArbre == true) {
+					intentionEtape = IntentionEtape.CHERCHERARBRE;
+					action = Action.CHERCHER;
+				}
+				break;
+			}
+		} else if (intention == Intention.SEPROMENER) {
+			if (!inventairePlein) {
+				intention = Intention.RAMENERBOIS;
+				intentionEtape=IntentionEtape.CHERCHERARBRE;
+
 			}
 		}
 	}

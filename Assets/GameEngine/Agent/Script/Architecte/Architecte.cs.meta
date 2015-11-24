@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5d3d328c8c4044d46b5a44038b6b4916
+timeCreated: 1448358518
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - dialogue: {instanceID: 0}
+  - chantier: {fileID: 186574, guid: 7b213a528b4c0b847bc20bfb3a56a5b9, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

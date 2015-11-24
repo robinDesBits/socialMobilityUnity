@@ -13,9 +13,9 @@ public abstract class Personnage : MonoBehaviour {
 	protected IntentionEtape intentionEtape;
 	protected Action action;
 	
-	protected enum Action{ABORDER, SEDIRIGERVERS,CHERCHER, SEPROMENER,/*bucheron*/COUPERARBRE};
-	protected enum Intention{SEPROMENER,/*bucheron*/RAMENERBOIS,/*marchand*/ACHETERRESSOURCE};
-	protected enum IntentionEtape{ABORDER,/*bucheron*/CHERCHERARBRE,COUPERARBRE,/*marchand*/CHERCHERVENDEUR};
+	protected enum Action{ABORDER, SEDIRIGERVERS,CHERCHER, SEPROMENER,/*bucheron*/COUPERARBRE, /*architecte*/ CONSTRUIRE,POSERCHANTIER};
+	protected enum Intention{SEPROMENER,/*bucheron*/RAMENERBOIS,/*marchand*/ACHETERRESSOURCE, /*architecte*/ CONSTRUIRE};
+	protected enum IntentionEtape{ABORDER,/*bucheron*/CHERCHERARBRE,COUPERARBRE,/*marchand*/CHERCHERVENDEUR, /*architecte*/POSERCHANTIER, CHERCHERMARCHAND, ALLERCHANTIER,CONSTRUIRE};
 	
 	protected bool actionEnCours;
 
@@ -24,7 +24,7 @@ public abstract class Personnage : MonoBehaviour {
 	protected List<Transform> champVision;
 	protected List<Transform> contact;
 
-	protected Inventaire inventaire;
+	public Inventaire inventaire;
 	public BoucheAgent dialogue;
 	protected bool inventairePlein;
 	
@@ -165,23 +165,25 @@ public abstract class Personnage : MonoBehaviour {
 				Tourner(1);
 			}
 		}
-		
-
-		
 	}
 	protected virtual void OnTriggerEnter2D(Collider2D other)
 	{
-		if(other.gameObject.CompareTag("Mur")||other.gameObject.CompareTag("Arbre")||other.gameObject.CompareTag("Personnage"))
-		{
-			if(!champVision.Contains(other.transform))
+		if (other.gameObject.CompareTag ("Mur") || other.gameObject.CompareTag ("Arbre")) {
+			if (!champVision.Contains (other.transform)) {
+				champVision.Add (other.transform);
+			}
+		} else if (other.gameObject.CompareTag ("Personnage")) {
+			if(!other.isTrigger)
 			{
-				champVision.Add(other.transform);
+				if (!champVision.Contains (other.transform)) {
+					champVision.Add (other.transform);
+				}
 			}
 		}
 	}
 	protected virtual void OnTriggerExit2D(Collider2D other)
 	{
-		if(other.gameObject.CompareTag("Mur")||other.gameObject.CompareTag("Arbre")||other.gameObject.CompareTag("Personnage"))
+		if(other.gameObject.CompareTag("Mur")||other.gameObject.CompareTag("Arbre")|| other.gameObject.CompareTag ("Personnage"))
 		{
 			if(champVision.Contains(other.transform))
 			{
@@ -217,7 +219,10 @@ public abstract class Personnage : MonoBehaviour {
         float rot_z = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
 		transform.rotation = Quaternion.Euler(0f, 0f, rot_z + 90);
 	}
-
+	protected void OnMouseDown()
+	{
+		print ("agent n°"+idAgent + "\n Inventaire: "+inventaire.ToString());
+	}
 	protected abstract void ChoisirAction();
 	protected abstract void FaireAction();
 

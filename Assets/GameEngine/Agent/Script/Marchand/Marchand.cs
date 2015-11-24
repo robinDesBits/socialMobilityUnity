@@ -59,14 +59,14 @@ public class Marchand : Personnage {
 		if (action == Action.CHERCHER) {
 			SeBaladerEnCherchant ();
 		} else if (action == Action.ABORDER) {
-			dialogue.Aborder (cible);
+			dialogue.Aborder (cible, BoucheAgent.Discution.BOIS);
 		} else if (action == Action.SEDIRIGERVERS) {
 			SeDirigerVers ();
 		}
 	}
 	protected bool AgentLibre(Transform t)
 	{
-		return t.CompareTag ("Personnage") && !dialogue.personneAborde.Contains (t);
+		return t.CompareTag ("Personnage") && t.gameObject.name.StartsWith("Bucheron") && !dialogue.personneAborde.Contains (t);
 	}
 	protected override void OnTriggerEnter2D(Collider2D other)
 	{
