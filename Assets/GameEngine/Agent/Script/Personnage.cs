@@ -13,21 +13,30 @@ public abstract class Personnage : MonoBehaviour {
 	protected IntentionEtape intentionEtape;
 	protected Action action;
 	
-	protected enum Action{ABORDER, SEDIRIGERVERS,CHERCHER, SEPROMENER,/*bucheron*/COUPERARBRE, /*architecte*/ CONSTRUIRE,POSERCHANTIER};
-	protected enum Intention{SEPROMENER,/*bucheron*/RAMENERBOIS,/*marchand*/ACHETERRESSOURCE, /*architecte*/ CONSTRUIRE};
-	protected enum IntentionEtape{ABORDER,/*bucheron*/CHERCHERARBRE,COUPERARBRE,/*marchand*/CHERCHERVENDEUR, /*architecte*/POSERCHANTIER, CHERCHERMARCHAND, ALLERCHANTIER,CONSTRUIRE};
+	protected enum Action{ABORDER, SEDIRIGERVERS,CHERCHER, SEPROMENERDANSZONE,/*bucheron*/COUPERARBRE, /*architecte*/ CONSTRUIRE,POSERCHANTIER};
+	protected enum Intention{SEPROMENER,/*bucheron*/RAMENERBOIS,/*marchand*/ACHETERRESSOURCE, VENDRERESSOURCE, /*architecte*/ CONSTRUIRE};
+	protected enum IntentionEtape{ABORDER,/*bucheron*/CHERCHERARBRE,COUPERARBRE,/*marchand*/CHERCHERVENDEUR, ALLERMARCHE, /*architecte*/POSERCHANTIER, CHERCHERMARCHAND, ALLERCHANTIER,CONSTRUIRE};
 	
 	protected bool actionEnCours;
 
 	protected Transform cible;
+	protected Transform cibleNuit;
+
+	public int energie;
+	public bool faitDodo;
+
+	protected Zone ville;
+	protected Batiment hotelFavori;
 	
 	protected List<Transform> champVision;
 	protected List<Transform> contact;
 
+	protected Transform centreCarte;
+
+	protected List<Zone> murs;
 	public Inventaire inventaire;
 	public BoucheAgent dialogue;
-	protected bool inventairePlein;
-	
+
 	private int coteEvitementObstacle=0;
 
 	protected virtual void Start()
@@ -35,31 +44,92 @@ public abstract class Personnage : MonoBehaviour {
 		champVision= new List<Transform>();
 		contact=new List<Transform>();
 		inventaire=new Inventaire();
+		energie = 100;
 		dialogue = gameObject.AddComponent <BoucheAgent>() as BoucheAgent;
 		actionEnCours=false;
 		idAgent = nbAgent++;
+		faitDodo = false;
+		centreCarte = GameObject.FindGameObjectWithTag ("Plans").transform;
+		ville = GameObject.FindGameObjectWithTag("Ville").GetComponent<Ville>();
+		murs = new List<Zone> ();
+		foreach(GameObject m in GameObject.FindGameObjectsWithTag("Mur"))
+		{
+			murs.Add(m.GetComponent<Zone>());
+		}
+		StartCoroutine ("DiminutionEnergie");
 	}
 	protected virtual void Update()
 	{
-		ChoisirAction();
-		FaireAction();
+		//VerifierPosition ();
+		if (DeroulementJournee.nuit) {
+			ComportementNuit();
+		} else {
+			ChoisirAction ();
+			FaireAction ();
+			if(faitDodo)
+			{
+				faitDodo = false;
+			}
+		}
+	}
+	protected void VerifierPosition()
+	{
+		if (this.transform.localPosition.x < 0 || this.transform.localPosition.y > 0 ||this.transform.localPosition.x < 5 || this.transform.localPosition.y < -3) {
+			Vector3 tempPosition= new Vector3(0.1f,-0.1f,0);
+			this.transform.position=tempPosition;
+		}
+
+	}
+	protected void ComportementNuit()
+	{
+		if (faitDodo) {
+			cibleNuit = hotelFavori.transform;
+			return;
+		} else {
+			if (hotelFavori != null) {
+				if (hotelFavori.EstDansZone (this.transform)) {
+					if (hotelFavori.Dormir (this)) {
+						faitDodo = true;
+					}
+					else
+					{
+						SePromenerDansZone (ville);
+					}
+				} else {
+					cibleNuit = hotelFavori.transform;
+					SeDirigerVers ();
+				}
+			} else {
+				cibleNuit = ville.transform;
+				if (ville.EstDansZone (this.transform)) {
+					SePromenerDansZone (ville);
+				} else {
+					SeDirigerVers ();
+				}
+			}
+		}
 	}
 	protected void Avancer()
 	{
-		transform.Translate(0,-vitesse,0);
+		transform.Translate(0,-vitesse/DeroulementJournee.multiplicateurVitesse,0);
 	}
 	protected void Reculer()
 	{
-		transform.Translate(0,vitesse,0);
+		transform.Translate(0,vitesse/DeroulementJournee.multiplicateurVitesse,0);
 	}
 	protected void Tourner(int direction=1)
 	{
-		transform.Rotate(0,0,direction * vitesseRotation);
+		transform.Rotate(0,0,direction * vitesseRotation/DeroulementJournee.multiplicateurVitesse);
 	}
 		
 	protected void SeDirigerVers()
 	{
-		LookAt2D(cible);
+		if (DeroulementJournee.nuit) {
+			LookAt2D(cibleNuit);
+		} else {
+				LookAt2D(cible);
+		}
+
 		Avancer();
 	}
 	protected void SeBaladerAuHasard()
@@ -78,7 +148,26 @@ public abstract class Personnage : MonoBehaviour {
 			Avancer();
 		}
 	}
-	
+
+	protected void SePromenerDansZone(Zone z)
+	{
+		if (z.EstDansZone (this.transform)) {
+			Avancer ();
+		} else {
+			LookAt2D(z.transform);
+			this.transform.Rotate(0,0,Random.Range(-89,89));
+			Avancer ();
+		}
+	}
+	public IEnumerator Dormir()
+	{
+		yield return new WaitForSeconds (1*DeroulementJournee.multiplicateurVitesse);
+		if (DeroulementJournee.nuit) {
+			StartCoroutine("Dormir");
+		} else {
+			energie=100;
+		}
+	}
     int etape=0;	
 	protected void SeBaladerEnCherchant()
 	{
@@ -126,7 +215,16 @@ public abstract class Personnage : MonoBehaviour {
 				Avancer();
 		}
 	}
-	
+	protected IEnumerator DiminutionEnergie()
+	{
+		yield return new WaitForSeconds (10*DeroulementJournee.multiplicateurVitesse);
+		energie--;
+		if (energie == 0) {
+			print ("EST MORT!!!!");
+		} else {
+			StartCoroutine("DiminutionEnergie");
+		}
+	}
 	protected void EviterObstacle()
 	{
 		if(coteEvitementObstacle==0)
@@ -173,11 +271,15 @@ public abstract class Personnage : MonoBehaviour {
 				champVision.Add (other.transform);
 			}
 		} else if (other.gameObject.CompareTag ("Personnage")) {
-			if(!other.isTrigger)
-			{
+			if (!other.isTrigger) {
 				if (!champVision.Contains (other.transform)) {
 					champVision.Add (other.transform);
 				}
+			}
+		} else if (other.gameObject.CompareTag ("Hotel")) {
+			if(!other.GetComponent<Batiment>().enChantier)
+			{
+				hotelFavori=other.GetComponent<Batiment>();
 			}
 		}
 	}
@@ -193,24 +295,22 @@ public abstract class Personnage : MonoBehaviour {
 	}
 	protected virtual void OnCollisionEnter2D(Collision2D other)
 	{
-
-		if(other.gameObject.CompareTag("Arbre")||other.gameObject.CompareTag("Mur")||other.gameObject.CompareTag("Personnage"))
-		{
-			if(!contact.Contains(other.transform))
-			{
-				contact.Add(other.transform);
+		if (other.gameObject.CompareTag ("Arbre") || other.gameObject.CompareTag ("Personnage")) {
+			if (!contact.Contains (other.transform)) {
+				contact.Add (other.transform);
 			}
+		} else if (other.gameObject.CompareTag ("Mur")) {
+			LookAt2D(centreCarte);
+			this.transform.Rotate(new Vector3(0,0,Random.Range(-89,89)));
 		}
+
 	}
 	protected virtual void OnCollisionExit2D(Collision2D other)
 	{
-		if(other.gameObject.CompareTag("Arbre")||other.gameObject.CompareTag("Mur")||other.gameObject.CompareTag("Personnage"))
-		{
 			if(contact.Contains(other.transform))
 			{
 				contact.Remove(other.transform);
 			}
-		}
 	}
 	protected void LookAt2D(Transform t)
 	{
@@ -221,7 +321,11 @@ public abstract class Personnage : MonoBehaviour {
 	}
 	protected void OnMouseDown()
 	{
-		print ("agent n°"+idAgent + "\n Inventaire: "+inventaire.ToString());
+		print (this.gameObject.name + "\n Inventaire: "+inventaire.ToString());
+		print (intention);
+		print (intentionEtape);
+		print (action);
+		print ("Dialogue ? " + dialogue.discutionEnCours + ", nbrPersonne mémorisé: " + dialogue.personneAborde.Count);
 	}
 	protected abstract void ChoisirAction();
 	protected abstract void FaireAction();

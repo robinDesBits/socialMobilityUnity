@@ -6,7 +6,13 @@ public class BoucheAgent: MonoBehaviour{
 
 	public bool discutionEnCours;
 	public List<Transform> personneAborde;
+
+	public bool estMarchand;
+	public int prix;
+
 	public Discution sujet;
+
+
 
 	public enum Discution{FORET,BOIS};
 
@@ -16,27 +22,44 @@ public class BoucheAgent: MonoBehaviour{
 	{
 		personneAborde = new List<Transform> ();
 		discutionEnCours = false;
+		prix = 2;
+		StartCoroutine ("finDialogueCoroutine");
 
+	}
+	public IEnumerator finDialogueCoroutine()
+	{
+		yield return new WaitForSeconds (10);
+		discutionEnCours = false;
+		StartCoroutine("finDialogueCoroutine");
 	}
 	public void Aborder(Transform t, Discution d)
 	{
-		personneAborde.Add (t);
-		elocuteur = t;
-		sujet = d;
-		discutionEnCours = true;
-		StartCoroutine ("AborderCoroutine");
+		if (discutionEnCours) {
+			return;
+		}
+		else {
+			personneAborde.Add (t);
+			elocuteur = t;
+			sujet = d;
+			discutionEnCours = true;
+			StartCoroutine ("OublierPersonne");
+			StartCoroutine ("AborderCoroutine");
+		}
 	}
 	private IEnumerator AborderCoroutine()
 	{
-		yield return null;
+		yield return new WaitForSeconds(0.5f*DeroulementJournee.multiplicateurVitesse);
 		print ("Bonjour toi");
 		elocuteur.GetComponent<Personnage>().dialogue.SeFaireAborder(this.transform);
 
 	}
 	public IEnumerator OublierPersonne()
 	{
-		yield return new WaitForSeconds (15.0f);
-		personneAborde.RemoveAt (0);
+		yield return new WaitForSeconds (5.0f*DeroulementJournee.multiplicateurVitesse);
+		if (personneAborde.Count > 0) {
+			personneAborde.RemoveAt (0);
+		}
+		discutionEnCours = false;
 	}
 	public void SeFaireAborder(Transform t)
 	{
@@ -46,7 +69,7 @@ public class BoucheAgent: MonoBehaviour{
 	}
 	private IEnumerator SeFaireAborderCoroutine()
 	{
-		yield return null;
+		yield return new WaitForSeconds(0.5f*DeroulementJournee.multiplicateurVitesse);
 		print ("Bien le bonjour");
 		elocuteur.GetComponent<Personnage>().dialogue.DebuterDiscution();
 	}
@@ -56,13 +79,15 @@ public class BoucheAgent: MonoBehaviour{
 	}
 	protected IEnumerator DebuterDiscutionCoroutine()
 	{
-		yield return null;
+		yield return new WaitForSeconds(0.5f*DeroulementJournee.multiplicateurVitesse);
 		print (sujet);
 		if (elocuteur.GetComponent<Personnage> ().dialogue.Demander (sujet)) {
 			elocuteur.GetComponent<Personnage> ().dialogue.CommencerNegociation();
 		} else {
 			print("ok crawoud");
 			FinirDiscution();
+			elocuteur.GetComponent<Personnage> ().dialogue.discutionEnCours=false;
+
 		}
 	}
 	public bool Demander(Discution s)
@@ -72,7 +97,6 @@ public class BoucheAgent: MonoBehaviour{
 			if(this.transform.GetComponent<Personnage>().inventaire.AObjet("Bois")!=null)
 			{
 				print("J'ai");
-				discutionEnCours=false;
 				return true;
 			}
 			else 
@@ -87,18 +111,24 @@ public class BoucheAgent: MonoBehaviour{
 	public void FinirDiscution()
 	{
 		discutionEnCours = false;
-		StartCoroutine ("OublierPersonne");
+
 
 	}
 	public void CommencerNegociation()
 	{
 		int nbrObjetsMarchande = 0;
-		int prix = 5;
 		print ("Jte propose "+prix + "€");
 		int nbrObjetPropose=this.transform.GetComponent<Personnage>().inventaire.CombienObjet("Bois");
-		if ((nbrObjetsMarchande = elocuteur.GetComponent<Personnage> ().dialogue.ProposerPrix (prix,nbrObjetPropose)) > 0) {
-			print("bah tient prend en" + nbrObjetsMarchande);
-			this.transform.GetComponent<Personnage>().inventaire.echanger("Bois",nbrObjetsMarchande,prix, elocuteur);
+		if ((nbrObjetsMarchande = elocuteur.GetComponent<Personnage> ().dialogue.ProposerPrix (prix, nbrObjetPropose)) > 0) {
+			print ("bah tient prend en" + nbrObjetsMarchande);
+			this.transform.GetComponent<Personnage> ().inventaire.echanger ("Bois", nbrObjetsMarchande, prix, elocuteur);
+			FinirDiscution ();
+			discutionEnCours = false;
+			elocuteur.GetComponent<Personnage> ().dialogue.discutionEnCours = false;
+		} else {
+			FinirDiscution();
+			discutionEnCours = false;
+			elocuteur.GetComponent<Personnage> ().dialogue.discutionEnCours = false;
 		}
 
 	}

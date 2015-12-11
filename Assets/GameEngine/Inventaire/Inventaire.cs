@@ -9,7 +9,7 @@ public class Inventaire{
 
 	public int argent;
 
-	protected List<Objet> contenu;
+	public List<Objet> contenu;
 
 
 	public Inventaire()
@@ -19,12 +19,13 @@ public class Inventaire{
 		argent = 15;
 		contenu=new List<Objet>();
 	}
-	public string ToString()
+	public override string ToString()
 	{
 		string toString = "Argent: " + argent;
 		for (int i=0; i< contenu.Count; i++) {
 			toString+="-"+ contenu[i].nomObjet;
 		}
+		toString += " est plein: " + InventairePlein ();
 		return toString;
 	}
 	public void echanger(string name,int nbrObjetDonner, int prix, Transform destinataire)
@@ -33,10 +34,16 @@ public class Inventaire{
 			Objet o=contenu.Find (x => x.nomObjet.Equals(name));
 			argent+=prix;
 			contenu.Remove(o);
+			porteActuel-=o.poidObjet;
 			destinataire.GetComponent<Personnage>().inventaire.AjouterObjet(o);
 			destinataire.GetComponent<Personnage>().inventaire.argent-=prix;
 			Debug.Log(o.nomObjet + " donné");
 		}
+	}
+	public void EnleverObjet(Objet o)
+	{
+			contenu.Remove(o);
+			porteActuel-=o.poidObjet;
 	}
 	public List<Objet> AObjet(string name)
 	{

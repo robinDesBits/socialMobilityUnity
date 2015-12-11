@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ZoneForet : MonoBehaviour {
+public class ZoneForet : Zone {
 
 	public int nombreArbreInitial;
 	private int nombreArbreActuel;

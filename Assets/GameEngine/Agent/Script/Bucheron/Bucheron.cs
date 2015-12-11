@@ -44,17 +44,18 @@ public class Bucheron : Personnage {
 				}
 				break;
 			case IntentionEtape.COUPERARBRE:
-				if (inventairePlein) {
+				if (inventaire.InventairePlein()) {
 					intention = Intention.SEPROMENER;
-					action = Action.SEPROMENER;
+					action = Action.SEPROMENERDANSZONE;
 				} else if (plusArbre == true) {
 					intentionEtape = IntentionEtape.CHERCHERARBRE;
-					action = Action.CHERCHER;
+					action = Action.SEPROMENERDANSZONE;
 				}
 				break;
 			}
 		} else if (intention == Intention.SEPROMENER) {
-			if (!inventairePlein) {
+
+			if (!inventaire.InventairePlein()) {
 				intention = Intention.RAMENERBOIS;
 				intentionEtape=IntentionEtape.CHERCHERARBRE;
 
@@ -80,8 +81,8 @@ public class Bucheron : Personnage {
 					StartCoroutine("CouperArbre");
 				}
 			break;
-			case Action.SEPROMENER:
-			SeBaladerAuHasard();
+			case Action.SEPROMENERDANSZONE:
+			SePromenerDansZone(forets[0]);
 			break;
 		}
 	}
@@ -89,20 +90,26 @@ public class Bucheron : Personnage {
 	
 	protected IEnumerator CouperArbre()
 	{
+		Arbre monArbre=cible.GetComponent<Arbre>();
 		actionEnCours=true;
-		if(cible.GetComponent<Arbre>().estLibre)
+		if(monArbre.estLibre)
 		{
-			cible.GetComponent<Arbre>().estLibre=false;
-			yield return new WaitForSeconds(2f);
-			plusArbre=cible.GetComponent<Arbre>().CouperArbre();
-			Objet o=new Objet("Bois",2);
-			inventaire.AjouterObjet(o);
-			if(inventaire.InventairePlein())
+			monArbre.estLibre=false;
+			yield return new WaitForSeconds(4f*DeroulementJournee.multiplicateurVitesse);
+			if(!DeroulementJournee.nuit)
 			{
-				inventairePlein=true;
+				plusArbre=monArbre.CouperArbre();
+				Objet o=new Objet("Bois",2);
+				inventaire.AjouterObjet(o);
+				monArbre.estLibre=true;
+				actionEnCours=false;
 			}
-			actionEnCours=false;
-			cible.GetComponent<Arbre>().estLibre=true;
+			else
+			{
+				monArbre.estLibre=true;
+				plusArbre=true;
+				actionEnCours=false;
+			}
 		}
 		else
 		{

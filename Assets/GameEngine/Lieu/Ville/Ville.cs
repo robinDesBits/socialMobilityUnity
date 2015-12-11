@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Ville : MonoBehaviour {
+public class Ville : Zone {
 
 	public int nombreBucheron;
 	public int nombreMarchand;

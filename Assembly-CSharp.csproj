@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\GameEngine\Agent\BarreVie.cs" />
      <Compile Include="Assets\GameEngine\Agent\Script\Architecte\Architecte.cs" />
      <Compile Include="Assets\GameEngine\Agent\Script\BoucheAgent.cs" />
      <Compile Include="Assets\GameEngine\Agent\Script\Bucheron\Bucheron.cs" />
@@ -56,9 +57,12 @@
      <Compile Include="Assets\GameEngine\Batiment\ListeBatiment.cs" />
      <Compile Include="Assets\GameEngine\Inventaire\Inventaire.cs" />
      <Compile Include="Assets\GameEngine\Inventaire\Objet.cs" />
+     <Compile Include="Assets\GameEngine\Journee\DeroulementJournee.cs" />
      <Compile Include="Assets\GameEngine\Lieu\Foret\Arbre.cs" />
      <Compile Include="Assets\GameEngine\Lieu\Foret\ZoneForet.cs" />
      <Compile Include="Assets\GameEngine\Lieu\Ville\Ville.cs" />
+     <Compile Include="Assets\GameEngine\Lieu\Zone.cs" />
+     <Compile Include="Assets\GameEngine\Souris\Souris.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/programme_perso/programation/unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
